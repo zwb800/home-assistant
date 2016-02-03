@@ -1,0 +1,15 @@
+sudo: false
+language: python
+cache:
+  directories:
+    - $HOME/.cache/pip
+    # - "$HOME/virtualenv/python$TRAVIS_PYTHON_VERSION"
+python:
+  - 3.4
+  - 3.5
+install:
+  - "true"
+script:
+  - script/cibuild
+matrix:
+  fast_finish: true
