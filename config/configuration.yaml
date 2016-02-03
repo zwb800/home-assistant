@@ -35,6 +35,10 @@ logbook:
 
 switch:
       platform: demo
+switch 2:
+      platform: mqtt
+      command_topic: "command_topic"
+      state_topic: "state_topic"
 lock:
       platform: demo
 
@@ -44,11 +48,16 @@ lock:
 #example:
 #        target: hello_world.Hello_World
 mqtt:
-      broker: m10.cloudmqtt.com
-      port: 12102
-      username: olqfiibh
-      password: mrK3YHshj42T
+      broker: 127.0.0.1
+#      broker: m10.cloudmqtt.com
+#      port: 12102
+#      username: olqfiibh
+#      password: mrK3YHshj42T
 
 mqtt_example:
+
+mqtt_pymata:
+
+
 
 

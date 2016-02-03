@@ -33,33 +33,25 @@ DEPENDENCIES = ['mqtt']
 CONF_TOPIC = 'topic'
 DEFAULT_TOPIC = 'home-assistant/mqtt_pymata'
 
+DEFAULT_NAME = "MQTT Switch"
+DEFAULT_QOS = 0
+DEFAULT_PAYLOAD_ON = "ON"
+DEFAULT_PAYLOAD_OFF = "OFF"
+DEFAULT_OPTIMISTIC = False
+DEFAULT_RETAIN = False
+
 
 def setup(hass, config):
     """ Setup our mqtt_example component. """
-    mqtt = loader.get_component('mqtt')
-    topic = config[DOMAIN].get('topic', DEFAULT_TOPIC)
-    entity_id = 'mqtt_pymata.last_message'
-
-    # Listen to a message on MQTT
-
-    def message_received(topic, payload, qos):
-        """ A new MQTT message has been received. """
-        hass.states.set(entity_id, payload)
-
-    mqtt.subscribe(hass, topic, message_received)
-
-    hass.states.set(entity_id, 'No messages')
-
-    # Service to publish a message on MQTT
-
-    def set_state_service(call):
-        """ Service to send a message. """
-        mqtt.publish(hass, topic, call.data.get('new_state'))
-
-    # Register our service with Home Assistant
-    hass.services.register(DOMAIN, 'set_state', set_state_service)
-
-    # return boolean to indicate that initialization was successful
+    mp = Mqtt_Pymata(hass,
+                     "state_topic",
+                     "command_topic",
+                     DEFAULT_QOS,
+                     DEFAULT_RETAIN,
+                     DEFAULT_PAYLOAD_ON,
+                     DEFAULT_PAYLOAD_OFF,
+                     DEFAULT_OPTIMISTIC,
+                     0)
     return True
 
 
@@ -70,9 +62,17 @@ class Mqtt_Pymata:
 
         @return:
         """
+        self.hass = hass
+        self._mqtt = loader.get_component('mqtt')
+        self._switch = loader.get_component("switch")
         self._hass = hass
-        self.core = PymataCore()
-        mqtt = loader.get_component('mqtt')
+        self._state_topic = state_topic
+        self._command_topic = command_topic
+        self._qos = qos
+        self._retain = retain
+        self._payload_on = payload_on
+        self._payload_off = payload_off
+        self._optimistic = optimistic
 
         def command_recevie(topic, payload, qos):
             if payload == payload_on:
@@ -80,18 +80,22 @@ class Mqtt_Pymata:
             elif payload == payload_off:
                 self.turn_off()
 
-        mqtt.subscribe(hass, command_topic, command_recevie)
+        self._mqtt.subscribe(hass, command_topic, command_recevie)
 
     def turn_on(self):
         """
 
         @return:
         """
-        self._hass.services.call(DOMAIN_SWITCH, SERVICE_TURN_ON)
+        self._switch.turn_on(self._hass,"switch.ac")
+        self._mqtt.publish(self.hass, self._state_topic, self._payload_on,
+                     self._qos, self._retain)
 
     def turn_off(self):
         """
 
         @return:
         """
-        self._hass.services.call(DOMAIN_SWITCH, SERVICE_TURN_OFF)
+        self._switch.turn_off(self._hass,"switch.ac")
+        self._mqtt.publish(self.hass, self._state_topic, self._payload_off,
+                     self._qos, self._retain)
