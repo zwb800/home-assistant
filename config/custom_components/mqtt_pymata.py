@@ -20,13 +20,15 @@ mqtt_example:
 import homeassistant.loader as loader
 from pymata_aio.pymata_core import PymataCore
 from pymata_aio.constants import Constants
+from homeassistant.const import EVENT_STATE_CHANGED, EVENT_TIME_CHANGED
+from homeassistant.components.switch import DOMAIN as DOMAIN_SWITCH, SERVICE_TURN_ON, \
+    SERVICE_TURN_OFF, STATE_ON, ENTITY_ID_ALL_SWITCHES, is_on, turn_off, turn_on
 
 # The domain of your component. Should be equal to the name of your component
 DOMAIN = "mqtt_pymata"
 
 # List of component names (string) your component depends upon
 DEPENDENCIES = ['mqtt']
-
 
 CONF_TOPIC = 'topic'
 DEFAULT_TOPIC = 'home-assistant/mqtt_pymata'
@@ -62,19 +64,34 @@ def setup(hass, config):
 
 
 class Mqtt_Pymata:
-    def __init__(self,hass,state_topic, command_topic, qos, retain,
+    def __init__(self, hass, state_topic, command_topic, qos, retain,
                  payload_on, payload_off, optimistic, value_template):
         """
 
         @return:
         """
+        self._hass = hass
         self.core = PymataCore()
-        self.mqtt = loader.get_component('mqtt')
+        mqtt = loader.get_component('mqtt')
 
-        self.mqtt.subscribe(hass, command_topic, self.command)
+        def command_recevie(topic, payload, qos):
+            if payload == payload_on:
+                self.turn_on()
+            elif payload == payload_off:
+                self.turn_off()
 
-    def command(self,topic, payload, qos):
+        mqtt.subscribe(hass, command_topic, command_recevie)
+
+    def turn_on(self):
         """
 
         @return:
         """
+        self._hass.services.call(DOMAIN_SWITCH, SERVICE_TURN_ON)
+
+    def turn_off(self):
+        """
+
+        @return:
+        """
+        self._hass.services.call(DOMAIN_SWITCH, SERVICE_TURN_OFF)
