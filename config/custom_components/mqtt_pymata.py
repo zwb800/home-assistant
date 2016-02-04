@@ -87,7 +87,7 @@ class Mqtt_Pymata:
 
         @return:
         """
-        self._switch.turn_on(self._hass,"switch.ac")
+        self._switch.turn_on(self._hass,"switch.arduino")
         self._mqtt.publish(self.hass, self._state_topic, self._payload_on,
                      self._qos, self._retain)
 
@@ -96,6 +96,6 @@ class Mqtt_Pymata:
 
         @return:
         """
-        self._switch.turn_off(self._hass,"switch.ac")
+        self._switch.turn_off(self._hass,"switch.arduino")
         self._mqtt.publish(self.hass, self._state_topic, self._payload_off,
                      self._qos, self._retain)

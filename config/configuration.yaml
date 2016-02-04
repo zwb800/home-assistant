@@ -33,12 +33,13 @@ frontend:
 # View all events in a logbook
 logbook:
 
+
+
 switch:
-      platform: demo
-switch 2:
       platform: mqtt
-      command_topic: "command_topic"
-      state_topic: "state_topic"
+      command_topic: "command_arduino_switch"
+      state_topic: "state_arduino_switch"
+      optimistic: true
 lock:
       platform: demo
 
@@ -54,9 +55,8 @@ mqtt:
 #      username: olqfiibh
 #      password: mrK3YHshj42T
 
-mqtt_example:
+#mqtt_example:
 
-mqtt_pymata:
 
 
 
