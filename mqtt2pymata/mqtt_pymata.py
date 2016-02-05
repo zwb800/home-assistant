@@ -1,14 +1,37 @@
+
+import time
 import paho.mqtt.client as mqtt
 from PyMata.pymata import PyMata
 from pymata_aio.pymata_core import PymataCore
 
+PIN_MODE = 0  # This is the PyMata Pin MODE = ANALOG = 2 and DIGITAL = 0x20:
+PIN_NUMBER = 1
+DATA_VALUE = 2
 
 class Mqtt_Pymata:
     def __init__(self,  name, broker, port, keepalive, state_topic, command_topic, qos, retain,
                  payload_on, payload_off, optimistic, value_template,serial_port,switch_pin):
         self._switch_pin = switch_pin
-        self._board = PyMata(serial_port)
+        self._board = PyMata(serial_port,False,verbose=True)
         self._board.set_pin_mode(self._switch_pin,self._board.OUTPUT,self._board.DIGITAL)
+
+        A0 = 7
+        def pin_callback(data):
+            print("Analog Data: ",
+                  " Pin: ", data[PIN_NUMBER],
+                  " Pin Mode: ", data[PIN_MODE],
+                  " Data Value: ", data[DATA_VALUE])
+            self._board.set_analog_latch(A0,self._board.ANALOG_LATCH_GT,500,pin_callback)
+
+
+        self._board.set_pin_mode(A0, self._board.INPUT, self._board.ANALOG)
+        self._board.set_sampling_interval(100)
+        self._board.set_analog_latch(A0,self._board.ANALOG_LATCH_GT,500,pin_callback)
+
+        # while True:
+        #     time.sleep(0.1)
+        #     value = self._board.analog_read(A0)
+        #     print(value)
 
         self._mqtt = mqtt.Client()
 
