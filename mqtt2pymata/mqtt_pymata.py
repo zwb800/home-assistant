@@ -24,9 +24,9 @@ class Mqtt_Pymata:
             self._board.set_analog_latch(A0,self._board.ANALOG_LATCH_GT,500,pin_callback)
 
 
-        self._board.set_pin_mode(A0, self._board.INPUT, self._board.ANALOG)
-        self._board.set_sampling_interval(100)
-        self._board.set_analog_latch(A0,self._board.ANALOG_LATCH_GT,500,pin_callback)
+        # self._board.set_pin_mode(A0, self._board.INPUT, self._board.ANALOG)
+        # self._board.set_sampling_interval(100)
+        # self._board.set_analog_latch(A0,self._board.ANALOG_LATCH_GT,500,pin_callback)
 
         # while True:
         #     time.sleep(0.1)

@@ -16,7 +16,7 @@ homeassistant:
 #introduction:
 
 # Enables support for tracking state changes over time.
-history:
+#history:
 
 # Enables the frontend
 frontend:
@@ -56,6 +56,9 @@ mqtt:
 #      password: mrK3YHshj42T
 
 #mqtt_example:
+
+http:
+  development: 1
 
 
 
